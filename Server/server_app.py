@@ -22,9 +22,9 @@ dbpath=os.path.join(os.getcwd(),'fc_db.db')
 
 @app.after_request
 def enable_cors(response):
-   response.headers[“Access-Control-Allow-Origin”] = “*”
-   response.headers[“Access-Control-Allow-Headers”] = “Content-Type, X-Token, Accept”
-   response.headers[“Access-Control-Allow-Methods”] = “OPTIONS, POST, PUT”
+   response.headers["Access-Control-Allow-Origin"] = "*"
+   response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Token, Accept"
+   response.headers["Access-Control-Allow-Methods"] = "OPTIONS, POST, PUT"
    return response
 
 
