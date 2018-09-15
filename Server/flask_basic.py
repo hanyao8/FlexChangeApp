@@ -91,10 +91,10 @@ def login():
 
     if success:
         #app.config.update(dict(USERNAME=content['username']))
-        json_output=json.dumps({'token':X_Token,'success':True,'is_main':False})
+        json_output=json.dumps({'token':X_Token,'success':True})
 
     else:
-        json_output=json.dumps({'token':'generic_token','success':False,'is_main':False})
+        json_output=json.dumps({'token':'generic_token','success':False})
     
     str_output=str(json.loads(json_output))
     return(json_output)
@@ -115,9 +115,11 @@ def wallets():
     conn=sq3.connect(dbpath)
     df_user=pd.read_sql_query("SELECT * FROM user;",conn)
     df_wallets=pd.read_sql_query("SELECT * FROM wallets;",conn)
+    df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
     conn.close()
     
     try:
+    #if True:
         
         #current_user=app.config['USERNAME']
         current_user=((df_user.loc[df_user['xtoken']==X_Token])['username'].tolist())[0]
@@ -126,10 +128,21 @@ def wallets():
         df_current_wallet=df_wallets.loc[df_wallets['user_id']==current_user_id]
         current_wallet=df_current_wallet.values
 
-
+        
+        df_pending=df_trans.loc[df_trans['processed']=='False']
+        df_pending=df_pending.loc[df_pending['wallet_from_id']==current_user_id]
+        
+        pending_dict={}
+        for wc in df_current_wallet['currency'].unique():
+            df_temp_pendings=(df_pending.loc[df_pending['currency_from']==wc])
+            wc_pendings_list=[]
+            for i in range(0,(df_temp_pendings).shape[0]):
+                wc_pendings_list.append({'currency_to':df_temp_pendings['currency_to'][i] ,'amount':df_temp_pendings['amount_from'][i] ,'until':df_temp_pendings['until'][i] })
+            pending_dict[wc]=wc_pendings_list
+                
 
         n_wallets=current_wallet.shape[0]
-        json_output=json.dumps({'wallets':[{'currency':df_current_wallet['currency'][i] , 'amount':str(df_current_wallet['amount'][i])} for i in range(0,n_wallets) ] ,'is_main':True})
+        json_output=json.dumps({'wallets':[{'currency':df_current_wallet['currency'][i] , 'amount':str(df_current_wallet['amount'][i]),'is_main':i==0,'pending':pending_dict[df_current_wallet['currency'][i]] } for i in range(0,n_wallets) ]})
         
 
         
@@ -139,6 +152,8 @@ def wallets():
     except:
         json_output=json.dumps({'status':'unsuccessful'})
 
+    
+    #return(str(current_wallet))
     #return(current_user)
     #return('hellolo')
     #return(output)
@@ -183,10 +198,10 @@ def transaction():
     
         conn.close()
         output_message='success'
-        json_output=json.dumps({'success':True,'is_main':False})
+        json_output=json.dumps({'success':True})
     except:
         output_message='unsuccessful'
-        json_output=json.dumps({'success':False,'is_main':False})
+        json_output=json.dumps({'success':False})
         conn.close()
     #return(str(content))
     #return(current_user_id)
