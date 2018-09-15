@@ -12,9 +12,11 @@
       <form novalidate [formGroup]="depositForm" (ngSubmit)="depositTransaction()" autocomplete="off">
         <ion-row class="form-row">
           <ion-col class="form-col">
+            <h2>Change Your Currency</h2>
+            <p>Deposit the amount of mony you do like to exchange into the selected currency. The amount will be exchanged just at the right moment, when the rates are the best for you</p>
             <ion-item>
-              <ion-label>Currency To</ion-label>
-              <ion-select style="width: 100%;" formControlName="currencyTo">
+              <ion-label>Change Currency to</ion-label>
+              <ion-select formControlName="currencyTo">
                 <ion-option text-wrap *ngFor="let symbol of symbols" value="{{symbol.abbreviation}}">
                   ({{symbol.abbreviation}}) - {{symbol.name}}
                 </ion-option>
@@ -22,7 +24,8 @@
             </ion-item>
             <ion-item>
               <ion-label>Due Date</ion-label>
-              <ion-datetime displayFormat="DD.MM.YYYY" [min]="minDate" [max]="maxDate" formControlName="until"></ion-datetime>
+              <ion-datetime displayFormat="DD.MM.YYYY" [min]="minDate" [max]="maxDate"
+                            formControlName="until"></ion-datetime>
             </ion-item>
             <ion-item>
               <ion-input placeholder="Amount"

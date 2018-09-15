@@ -30,7 +30,7 @@ export class WalletPage {
     this.intervalSubscription = interval(3000).subscribe(() => this.walletProvider.getWalletsData());
   }
 
-  ionViewDidLoad() {
+  ionViewWillLoad() {
     this.walletProvider.getWalletsData();
   }
 

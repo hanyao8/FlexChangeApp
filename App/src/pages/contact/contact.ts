@@ -8,6 +8,7 @@ import { LoginPage } from "../login/login";
   templateUrl: 'contact.html'
 })
 export class ContactPage {
+  xwindow = window;
 
   constructor(public app: App, private auth: AuthProvider) {
     if (!this.auth.isAuthenticated()) {

@@ -3,6 +3,10 @@ page-deposit {
     white-space: normal !important;
   }
 
+  ion-select {
+    width: 100%;
+  }
+
   .item-md.item-input.ng-valid.item-input-has-value:not(.input-has-focus):not(.item-input-has-focus) .item-inner,
   .item-md.item-input.ng-valid.input-has-value:not(.input-has-focus):not(.item-input-has-focus) .item-inner,
   .item-md.item-input.ng-invalid.ng-touched:not(.input-has-focus):not(.item-input-has-focus) .item-inner,
@@ -18,15 +22,7 @@ page-deposit {
   }
 
   .form-row {
-    display: flex;
-    flex-direction: row;
-    height: 60vh;
-    align-content: space-between;
-  }
-
-  .form-col {
-    flex-direction: column;
-    display: flex;
-    align-content: space-between;
+    margin-top: 2vh;
+    height: 45vh;
   }
 }
