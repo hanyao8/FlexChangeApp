@@ -7,7 +7,50 @@
 
 </ion-header>
 
+<ion-content>
+    <ion-card class="current-amount">
+        <ion-card-header>
+          Current Amount
+        </ion-card-header>
+        <ion-card-content>
+            <ion-grid no-padding>
+                <ion-row justify-content-end>
+                  <ion-col>{{mainWallet.currency}}</ion-col>
+                  <ion-col text-right>{{mainWallet.amount}}</ion-col>
+                </ion-row>
+              </ion-grid>
+        </ion-card-content>
+      </ion-card>
+ 
+      <ion-grid padding>
+          <ion-row justify-content-end>
+            <ion-col align-self-center class="pending-title no-padding-b">Pending Amount</ion-col>
+            <ion-col text-right>
+              <button>
+                  <ion-icon name="add-circle" (click)="addPendingAmount()"></ion-icon>
+              </button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
 
-<ion-content padding>
+      <ion-card *ngFor="let wallet of wallets">
+          <ion-card-header>
+              {{wallet.currency}}
+          </ion-card-header>
+          <ion-card-content>
+              <ion-grid no-padding>
+                  <ion-row justify-content-end class="row-border-b">
+                      <ion-col>Balance</ion-col>
+                      <ion-col text-right>{{wallet.amount}}</ion-col>
+                  </ion-row>
 
+                  <ion-row justify-content-end class="row-border-b" *ngFor="let pending of wallet.pending">
+                      <ion-col>{{pending.currency}}</ion-col>
+                      <ion-col text-right>{{pending.amount}}</ion-col>
+                  </ion-row>
+              </ion-grid>
+          </ion-card-content>
+      </ion-card>
 </ion-content>
+
+

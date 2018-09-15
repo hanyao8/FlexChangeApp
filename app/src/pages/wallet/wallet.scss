@@ -1,3 +1,59 @@
 page-wallet {
+    .current-amount {
+        background: #003662;
+        margin: 0 0 2rem;
+        width: 100%;
+        padding: 2rem 2rem 5rem;
+        
+        .card-header-md {
+            font-size: 2rem;
+        }
 
+        ion-card-header,
+        ion-card-content {
+            color: white;
+        }
+    }
+
+    .card-header-md {
+        font-weight: bold;
+    }
+
+    .card-content-md {
+        font-size: 1.7rem;
+    }
+
+    .pending-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #003662;
+
+        + ion-col {
+
+            button {
+                background: #FFF;
+                padding: 0;
+            }
+
+            ion-icon {
+                font-size: 4rem;
+                color: #003662;
+            }
+        }
+    }
+
+   
+
+    .no-padding-b {
+        padding-bottom: 0 !important;
+    }
+
+    .row-border-b {
+        border-bottom: 1px solid #eeeeee;
+        padding: 5px 0;
+
+        &:last-of-type {
+            border-bottom: none;
+        }
+    }
 }
