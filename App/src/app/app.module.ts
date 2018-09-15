@@ -15,6 +15,7 @@ import { TokenInterceptor } from "../helpers/token.interceptor";
 import { LoginPage } from "../pages/login/login";
 import { AuthProvider } from '../providers/auth/auth';
 import { WalletPage } from "../pages/wallet/wallet";
+import { WalletProvider } from '../providers/wallet/wallet';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { WalletPage } from "../pages/wallet/wallet";
     AuthProvider,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},
+    WalletProvider,
   ]
 })
 export class AppModule {

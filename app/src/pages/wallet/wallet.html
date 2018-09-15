@@ -18,9 +18,9 @@
     </ion-card-header>
     <ion-card-content>
       <ion-grid no-padding>
-        <ion-row justify-content-end>
-          <ion-col>{{mainWallet.currency}}</ion-col>
-                  <ion-col text-right>{{mainWallet.amount.toFixed(2)}}</ion-col>
+        <ion-row justify-content-end *ngFor="let item of mainWallet.getValue()">
+          <ion-col>{{item.currency}}</ion-col>
+          <ion-col text-right>{{item.amount}}</ion-col>
         </ion-row>
       </ion-grid>
     </ion-card-content>
@@ -37,7 +37,7 @@
     </ion-row>
   </ion-grid>
 
-  <ion-card *ngFor="let wallet of wallets">
+  <ion-card *ngFor="let wallet of wallets.getValue()">
     <ion-card-header>
       {{wallet.currency}}
     </ion-card-header>
@@ -45,7 +45,7 @@
       <ion-grid no-padding>
           <ion-row justify-content-end class="row-border-b list-balance">
           <ion-col>Balance</ion-col>
-          <ion-col text-right>{{wallet.amount.toFixed(2)}}</ion-col>
+          <ion-col text-right>{{wallet.amount}}</ion-col>
         </ion-row>
 
         <ion-row class="row-border-b" *ngFor="let pending of wallet.pending">
