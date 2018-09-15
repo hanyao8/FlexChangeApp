@@ -14,6 +14,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { TokenInterceptor } from "../helpers/token.interceptor";
 import { LoginPage } from "../pages/login/login";
 import { AuthProvider } from '../providers/auth/auth';
+import { WalletPage } from "../pages/wallet/wallet";
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { AuthProvider } from '../providers/auth/auth';
     HomePage,
     TabsPage,
     LoginPage,
+    WalletPage,
   ],
   imports: [
     BrowserModule,
@@ -36,6 +38,7 @@ import { AuthProvider } from '../providers/auth/auth';
     ContactPage,
     HomePage,
     TabsPage,
+    WalletPage,
     LoginPage,
   ],
   providers: [
