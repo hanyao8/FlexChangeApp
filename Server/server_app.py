@@ -19,15 +19,19 @@ app=Flask(__name__)
 app.config.update(dict(SECRET_KEY='secret_key'))
 dbpath=os.path.join(os.getcwd(),'fc_db.db')
 
+
 @app.after_request
 def enable_cors(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+   response.headers["Access-Control-Allow-Origin"] = "*"
+   response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Token, Accept"
+   response.headers["Access-Control-Allow-Methods"] = "OPTIONS, POST, PUT, GET, DELETE"
+   return response
+
 
 @app.route("/")
 def index():
 
-    df_exch_rate=pd.DataFrame([0.86],index=['EUR'],columns=['USD']) #1 USD=X EUR
+    exch_rate=pd.DataFrame([[1.0,0.86],[1/0.86,1.0]],index=['EUR','USD'],columns=['EUR','USD']) #1 USD=X EUR
 
     nowtime=datetime.datetime.now()
     
@@ -42,25 +46,35 @@ def index():
     until_arr_str=df_trans['until'].tolist()
     until_arr=[datetime.datetime.strptime(time_item, '%Y-%m-%d')for time_item in until_arr_str]
 
-    rows_to_exe_list=[]
+    transid_to_exe_list=[]
     for i in range(0,len(until_arr)):
         if until_arr[i]<nowtime:
-            rows_to_exe_list.append(i)
+            transid_to_exe_list.append(df_trans['transaction_id'][i])
 
-    n_to_exe=len(rows_to_exe_list) #the number of transactions to execute
+    n_to_exe=len(transid_to_exe_list) #the number of transactions to execute
 
-    #for row_index in rows_to_exe_list:
-        #query_from="update wallets set amount=%d where(user_id=%d and currency='%s');"%(df_wallet.loc[df_wallet['']==])
-        #cur.execute(query_from)
-        #conn.commit()
+    for transid in transid_to_exe_list:
+        from_cur=df_trans['currency_from'][transid-1]
+        from_id=df_trans['wallet_from_id'][transid-1]
+        from_wallet=df_wallet.loc[df_wallet['currency']==from_cur]
+        from_wallet=from_wallet.loc[from_wallet['user_id']==from_id]
+        from_amount=from_wallet['amount'][0]-df_trans['amount_from'][transid-1]
         
-        #query_to="update wallets set amount=%d where(user_id=%d and currency='%s');"%()
-        #cur.execute(query_to)
-        #conn.commit()
+        query_from="update wallets set amount=%d where(user_id=%d and currency='%s');"%(from_amount,from_id,from_cur)
+        cur.execute(query_from)
 
-    #for i in range(0,n_to_exe):
-     #   cur.execute()
-    
+        to_cur=df_trans['currency_to'][transid-1]
+        to_id=df_trans['wallet_to_id'][transid-1]
+        to_wallet=df_wallet.loc[df_wallet['currency']==to_cur]
+        to_wallet=to_wallet.loc[to_wallet['user_id']==to_id]
+        to_amount=to_wallet['amount'][0]+df_trans['amount_to'][transid-1]*exch_rate['currency_from']['currency_to']
+        
+        query_to="update wallets set amount=%d where(user_id=%d and currency='%s');"%(to_amount,to_id,to_cur)
+        cur.execute(query_to)
+        
+        query_processed="update trans set processed='True' where(transaction_id=%d)"%(transid)
+        cur.execute(query_processed)
+        conn.commit()
 
     conn.close()
     #return()
