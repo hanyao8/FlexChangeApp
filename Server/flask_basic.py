@@ -26,37 +26,41 @@ def login():
     if request.method=='POST':
         heads=request.headers
         X_Token=heads['X-Token']
-        content=json.loads(request.json)
+        content=request.json
         
 
         conn=sq3.connect(dbpath)
         df=pd.read_sql_query("SELECT * FROM user;",conn)
-
-        cur=conn.cursor()
-        
-        query='select id from '
-
-        #cur.execute()
     
-    if :
+    #success=True
+    if not(content['username'] in df['username'].tolist()):
         success=False
-    elif :
-        success=False
-    elif :
-        success=True
+        message='1'
+    else: #the username does exist in the database
+        user_row_index=(df.index[df['username']==content['username']].tolist())[0]
+        if df.iloc[user_row_index]['password']==content['password']:
+            success=True
+            message='2'
+        else: #password doesn't match
+            success=False
+            message='3'
 
     if success:
         json_output=json.dumps([{'token':X_Token,'success':True}])
 
     else:
-        json_output=json.dumps([{'token':'somethingswrong',success:False}])
+        json_output=json.dumps([{'token':'somethingswrong','success':False}])
     
     str_output=str(json.loads(json_output))
-    #return(json_output)
-    #return(str_output)
-    #return('hello')
+    return(json_output)
+    #return(str_output+message)
+    #return(content['username'])
+    #return(str(df['username'].tolist()))
+    #return('hello_hello')
     #return(str(df.values))
-    return(str(content))
+    #return(str(df))
+    #return(content)
+    #return(str(content))
 
 @app.route("/wallets",methods=['GET','POST'])
 def update():
