@@ -4,6 +4,12 @@
       <ion-row>
         <img style="height: 15vh;margin-top: 15vh;" src="assets/imgs/cs-logo.png" alt="The logo of Credit Suisse Group AG">
       </ion-row>
+      <ion-row *ngIf="this.error">
+          <ion-col padding margin class="login-failed">
+            Login failed:<br />
+            Please check your Login information
+          </ion-col>
+      </ion-row>
       <form novalidate [formGroup]="loginForm" (ngSubmit)="login()" autocomplete="off">
         <ion-row>
           <ion-col>

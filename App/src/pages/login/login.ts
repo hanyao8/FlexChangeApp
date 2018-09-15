@@ -36,7 +36,7 @@ export class LoginPage {
     this.isLoading = true;
     this.auth.login(this.loginForm.controls['username'].value, this.loginForm.controls['password'].value)
       .subscribe((hasLoggedIn: boolean) => {
-        console.log(hasLoggedIn);
+        console.log(1, hasLoggedIn);
         if (hasLoggedIn) {
           this.isLoading = false;
           this.app.getRootNav().setRoot(TabsPage);
