@@ -1,10 +1,14 @@
-
 <ion-header>
-
-  <ion-navbar>
-    <ion-title>wallet</ion-title>
+  <ion-navbar color="primary">
+    <ion-title>
+      <img style="width: 30vw;" src="assets/imgs/cs-logo-negative.png" alt="">
+    </ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="logout()">
+        <ion-icon name="exit"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
-
 </ion-header>
 
 <ion-content>
