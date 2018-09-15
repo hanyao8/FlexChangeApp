@@ -14,7 +14,7 @@ export class DepositProvider {
   public depositTransaction(currencyFrom: string, currencyTo: string, amount: number, until: string): Observable<boolean> {
     const data = {
       currency_from: currencyFrom,
-      currencyTo: currencyTo,
+      currency_to: currencyTo,
       amount: amount,
       until: until,
     };
