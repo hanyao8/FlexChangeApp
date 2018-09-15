@@ -64,15 +64,15 @@ def index():
 @app.route("/login",methods=['GET','POST'])
 def login():
     #error=None
-    if request.method=='POST':
-        heads=request.headers
-        X_Token=heads['X-Token']
-        content=request.json #decoded here into dict
+    #if request.method=='POST':
+    #heads=request.headers
+    #X_Token=heads['X-Token']
+    content=request.json #decoded here into dict
         
 
-        conn=sq3.connect(dbpath)
-        df=pd.read_sql_query("SELECT * FROM user;",conn)
-        conn.close()
+    conn=sq3.connect(dbpath)
+    df=pd.read_sql_query("SELECT * FROM user;",conn)
+    conn.close()
 
     #success=True
     if not(content['username'] in df['username'].tolist()):
@@ -83,17 +83,18 @@ def login():
         if df.iloc[user_row_index]['password']==content['password']:
             success=True
             message='2'
-            session['logged_in']=True
+            #session['logged_in']=True
+            X_Token=df['xtoken'][user_row_index]
         else: #password doesn't match
             success=False
             message='3'
 
     if success:
-        app.config.update(dict(USERNAME=content['username']))
-        json_output=json.dumps([{'token':X_Token,'success':True,'is_main':False}])
+        #app.config.update(dict(USERNAME=content['username']))
+        json_output=json.dumps({'token':X_Token,'success':True,'is_main':False})
 
     else:
-        json_output=json.dumps([{'token':'somethingswrong','success':False,'is_main':False}])
+        json_output=json.dumps({'token':'generic_token','success':False,'is_main':False})
     
     str_output=str(json.loads(json_output))
     return(json_output)
@@ -108,26 +109,36 @@ def login():
 
 @app.route("/wallets")
 def wallets():
+    heads=request.headers
+    X_Token=heads['X-Token']
+
     conn=sq3.connect(dbpath)
     df_user=pd.read_sql_query("SELECT * FROM user;",conn)
     df_wallets=pd.read_sql_query("SELECT * FROM wallets;",conn)
     conn.close()
+    
+    try:
+        
+        #current_user=app.config['USERNAME']
+        current_user=((df_user.loc[df_user['xtoken']==X_Token])['username'].tolist())[0]
+        current_user_rowindex=(df_user.index[df_user['username']==current_user].tolist())[0]
+        current_user_id=df_user['id'][current_user_rowindex]
+        df_current_wallet=df_wallets.loc[df_wallets['user_id']==current_user_id]
+        current_wallet=df_current_wallet.values
 
-    current_user=app.config['USERNAME']
-    current_user_rowindex=(df_user.index[df_user['username']==current_user].tolist())[0]
-    current_user_id=df_user['id'][current_user_rowindex]
-    df_current_wallet=df_wallets.loc[df_wallets['user_id']==current_user_id]
-    current_wallet=df_current_wallet.values
 
 
+        n_wallets=current_wallet.shape[0]
+        json_output=json.dumps({'wallets':[{'currency':df_current_wallet['currency'][i] , 'amount':str(df_current_wallet['amount'][i])} for i in range(0,n_wallets) ] ,'is_main':True})
+        
 
-    n_wallets=current_wallet.shape[0]
-    json_output=json.dumps({'wallets':[{'currency':df_current_wallet['currency'][i] , 'amount':str(df_current_wallet['amount'][i])} for i in range(0,n_wallets) ] ,'is_main':True})
+        
+        str_output=str(json.loads(json_output))
     
 
-    
-    str_output=str(json.loads(json_output))
-    
+    except:
+        json_output=json.dumps({'status':'unsuccessful'})
+
     #return(current_user)
     #return('hellolo')
     #return(output)
@@ -138,28 +149,37 @@ def wallets():
 
 @app.route("/transaction",methods=['GET','POST'])
 def transaction():
+    heads=request.headers
+    X_Token=heads['X-Token']
+
     try:
         content=request.json #decoded here into dict
     
         conn=sq3.connect(dbpath)
         df_user=pd.read_sql_query("SELECT * FROM user;",conn)
         df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
-   
-        current_user=app.config['USERNAME']
+
+
+        current_user=((df_user.loc[df_user['xtoken']==X_Token])['username'].tolist())[0]
+        #current_user=app.config['USERNAME']
+
         current_user_rowindex=(df_user.index[df_user['username']==current_user].tolist())[0]
         current_user_id=df_user['id'][current_user_rowindex]
-
-
+        
         cur=conn.cursor()
-        write_query="insert into trans(wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from, processed) values(%d,%d,'%s','%s','%s',%.2f,%r);"%(current_user_id,current_user_id,content['currency_from'],content['currency_to'],content['until'],float(content['amount']),False)
-        cur.execute(write_query) #to implement functionality to account for modification of column names
-    #cur.execute("insert into trans(id, wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from) values(1,1,1,'EUR','USD','2018-09-18',50.00);")
+        write_query="insert into trans(wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from, processed) values(%d,%d,'%s','%s','%s',%.2f,'%s');"%(current_user_id,current_user_id,content['currency_from'],content['currency_to'],content['until'],float(content['amount']),'False')
+        
+        cur.execute(write_query) 
+        #to implement functionality to account for modification of column names
+        
+        #cur.execute("insert into trans(id, wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from) values(1,1,1,'EUR','USD','2018-09-18',50.00);")
+        
         conn.commit()
-    #try:
+        #try:
         #success=True
-    #except:
+        #except:
         #success=False
-    #json_output=json.dumps([{'success':success}])
+        #json_output=json.dumps([{'success':success}])
     
         conn.close()
         output_message='success'
@@ -167,6 +187,9 @@ def transaction():
     except:
         output_message='unsuccessful'
         json_output=json.dumps({'success':False,'is_main':False})
+        conn.close()
+    #return(str(content))
+    #return(current_user_id)
     #return(output_message)
     return(json_output)
     #return(write_query)
