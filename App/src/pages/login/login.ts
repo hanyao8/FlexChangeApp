@@ -39,8 +39,6 @@ export class LoginPage {
         console.log(hasLoggedIn);
         if (hasLoggedIn) {
           this.isLoading = false;
-          // todo remove after API fix
-          localStorage.setItem('token', 'YOU REALLY NEED TO REMOVE THIS TOKEN');
           this.app.getRootNav().setRoot(TabsPage);
           return;
         }

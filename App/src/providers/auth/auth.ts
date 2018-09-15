@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { environment } from "../../environment/environment";
 import { catchError, map } from "rxjs/operators";
 import { Observable } from "rxjs";
-import { of } from "rxjs/observable/of";
 
 @Injectable()
 export class AuthProvider {
@@ -17,19 +16,17 @@ export class AuthProvider {
       password: password,
     };
     const url = environment.serverUrl + '/login';
-    return of(true);
-    // TODO uncomment this
-    // return this.http.post(url, JSON.stringify(data)).pipe(
-    //   map((response: any) => {
-    //     console.log(response);
-    //     if (response && 'status' in response && response.status === 200) {
-    //       localStorage.setItem('token', response.token);
-    //       return true;
-    //     }
-    //
-    //     return false;
-    //   }),
-    // );
+    return this.http.post(url, JSON.stringify(data)).pipe(
+      map((response: any) => {
+        console.log(response);
+        if (response && 'status' in response && response.status === 200) {
+          localStorage.setItem('token', response.token);
+          return true;
+        }
+
+        return false;
+      }),
+    );
   }
 
   public logout() {
