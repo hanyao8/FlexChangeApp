@@ -19,7 +19,7 @@ export class AuthProvider {
     return this.http.post(url, JSON.stringify(data)).pipe(
       map((response: any) => {
         console.log(response);
-        if (response && 'status' in response && response.status === 200) {
+        if (response && 'token' in response) {
           localStorage.setItem('token', response.token);
           return true;
         }
