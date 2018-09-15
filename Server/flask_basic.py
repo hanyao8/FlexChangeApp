@@ -29,7 +29,7 @@ def index():
     conn=sq3.connect(dbpath)
     df_user=pd.read_sql_query("SELECT * FROM user;",conn)
     df_wallet=pd.read_sql_query("SELECT * FROM wallets;",conn)
-    df_trans=pd.read_sql_query("SELECT * FROM trans2;",conn)
+    df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
     cur=conn.cursor()
 
     #if nowtime>untiltime: #execute last transaction and delete in database
@@ -143,7 +143,7 @@ def transaction():
     
         conn=sq3.connect(dbpath)
         df_user=pd.read_sql_query("SELECT * FROM user;",conn)
-        df_trans=pd.read_sql_query("SELECT * FROM trans2;",conn)
+        df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
    
         current_user=app.config['USERNAME']
         current_user_rowindex=(df_user.index[df_user['username']==current_user].tolist())[0]
@@ -151,7 +151,7 @@ def transaction():
 
 
         cur=conn.cursor()
-        write_query="insert into trans2(wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from, processed) values(%d,%d,'%s','%s','%s',%.2f,%r);"%(current_user_id,current_user_id,content['currency_from'],content['currency_to'],content['until'],float(content['amount']),False)
+        write_query="insert into trans(wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from, processed) values(%d,%d,'%s','%s','%s',%.2f,%r);"%(current_user_id,current_user_id,content['currency_from'],content['currency_to'],content['until'],float(content['amount']),False)
         cur.execute(write_query) #to implement functionality to account for modification of column names
     #cur.execute("insert into trans(id, wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from) values(1,1,1,'EUR','USD','2018-09-18',50.00);")
         conn.commit()
@@ -182,3 +182,6 @@ def transaction():
 
 if __name__=="__main__":
     app.run(debug=True)
+
+
+
