@@ -13,6 +13,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { TokenInterceptor } from "../helpers/token.interceptor";
 import { LoginPage } from "../pages/login/login";
+import { WalletPage } from "../pages/wallet/wallet";
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { LoginPage } from "../pages/login/login";
     HomePage,
     TabsPage,
     LoginPage,
+    WalletPage,
   ],
   imports: [
     BrowserModule,
@@ -33,7 +35,8 @@ import { LoginPage } from "../pages/login/login";
     AboutPage,
     ContactPage,
     HomePage,
-    TabsPage
+    TabsPage,
+    WalletPage
   ],
   providers: [
     StatusBar,
