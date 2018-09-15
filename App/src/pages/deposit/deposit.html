@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>
+      Deposit Transaction
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-grid style="height: 100%;">
+    <ion-col>
+      <form novalidate [formGroup]="depositForm" (ngSubmit)="depositTransaction()" autocomplete="off">
+        <ion-row class="form-row">
+          <ion-col class="form-col">
+            <ion-item>
+              <ion-label>Currency To</ion-label>
+              <ion-select style="width: 100%;" formControlName="currencyTo">
+                <ion-option text-wrap *ngFor="let symbol of symbols" value="{{symbol.abbreviation}}">
+                  ({{symbol.abbreviation}}) - {{symbol.name}}
+                </ion-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label>Due Date</ion-label>
+              <ion-datetime displayFormat="DD.MM.YYYY" [min]="minDate" [max]="maxDate" formControlName="until"></ion-datetime>
+            </ion-item>
+            <ion-item>
+              <ion-input placeholder="Amount"
+                         formControlName="amount"
+                         type="number"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <button ion-button class="submit-btn"
+                    full
+                    type="submit"
+                    [disabled]="!depositForm.valid">
+              Deposit
+            </button>
+          </ion-col>
+        </ion-row>
+      </form>
+    </ion-col>
+  </ion-grid>
+</ion-content>

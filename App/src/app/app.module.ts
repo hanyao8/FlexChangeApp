@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
-import { AboutPage } from '../pages/about/about';
 import { ContactPage } from '../pages/contact/contact';
 import { HomePage } from '../pages/home/home';
 import { TabsPage } from '../pages/tabs/tabs';
@@ -15,17 +14,20 @@ import { TokenInterceptor } from "../helpers/token.interceptor";
 import { LoginPage } from "../pages/login/login";
 import { AuthProvider } from '../providers/auth/auth';
 import { WalletPage } from "../pages/wallet/wallet";
+import { DepositPage } from "../pages/deposit/deposit";
+import { DepositProvider } from '../providers/deposit/deposit';
+import { CurrencyProvider } from '../providers/currency/currency';
 import { WalletProvider } from '../providers/wallet/wallet';
 
 @NgModule({
   declarations: [
     MyApp,
-    AboutPage,
     ContactPage,
     HomePage,
     TabsPage,
     LoginPage,
     WalletPage,
+    DepositPage,
   ],
   imports: [
     BrowserModule,
@@ -35,12 +37,12 @@ import { WalletProvider } from '../providers/wallet/wallet';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    AboutPage,
     ContactPage,
     HomePage,
     TabsPage,
     WalletPage,
     LoginPage,
+    DepositPage,
   ],
   providers: [
     StatusBar,
@@ -49,6 +51,8 @@ import { WalletProvider } from '../providers/wallet/wallet';
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},
     WalletProvider,
+    DepositProvider,
+    CurrencyProvider,
   ]
 })
 export class AppModule {
