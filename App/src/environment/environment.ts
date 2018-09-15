@@ -1,4 +1,4 @@
 export const environment = {
-  serverUrl: 'http://heroku.com/',
+  serverUrl: 'https://radiant-earth-58477.herokuapp.com',
   version: '0.0.1',
 };
