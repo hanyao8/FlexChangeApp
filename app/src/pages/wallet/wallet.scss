@@ -42,7 +42,24 @@ page-wallet {
         }
     }
 
-   
+    .list-balance {
+        padding-bottom: 2rem;
+        color: #003662;
+        font-weight: bold;
+    }
+
+    .list-head {
+        ion-col {
+            font-weight: bold;
+            padding: 0;
+        }
+    }
+
+    .list-content {
+        ion-col {
+            padding: 0;
+        }
+    }
 
     .no-padding-b {
         padding-bottom: 0 !important;

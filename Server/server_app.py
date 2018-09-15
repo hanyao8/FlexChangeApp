@@ -19,15 +19,19 @@ app=Flask(__name__)
 app.config.update(dict(SECRET_KEY='secret_key'))
 dbpath=os.path.join(os.getcwd(),'fc_db.db')
 
+
 @app.after_request
 def enable_cors(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+   response.headers["Access-Control-Allow-Origin"] = "*"
+   response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Token, Accept"
+   response.headers["Access-Control-Allow-Methods"] = "OPTIONS, POST, PUT, GET, DELETE"
+   return response
+
 
 @app.route("/")
 def index():
 
-    df_exch_rate=pd.DataFrame([0.86],index=['EUR'],columns=['USD']) #1 USD=X EUR
+    exch_rate=pd.DataFrame([[1.0,0.86],[1/0.86,1.0]],index=['EUR','USD'],columns=['EUR','USD']) #1 USD=X EUR
 
     nowtime=datetime.datetime.now()
     
@@ -42,25 +46,35 @@ def index():
     until_arr_str=df_trans['until'].tolist()
     until_arr=[datetime.datetime.strptime(time_item, '%Y-%m-%d')for time_item in until_arr_str]
 
-    rows_to_exe_list=[]
+    transid_to_exe_list=[]
     for i in range(0,len(until_arr)):
         if until_arr[i]<nowtime:
-            rows_to_exe_list.append(i)
+            transid_to_exe_list.append(df_trans['transaction_id'][i])
 
-    n_to_exe=len(rows_to_exe_list) #the number of transactions to execute
+    n_to_exe=len(transid_to_exe_list) #the number of transactions to execute
 
-    #for row_index in rows_to_exe_list:
-        #query_from="update wallets set amount=%d where(user_id=%d and currency='%s');"%(df_wallet.loc[df_wallet['']==])
-        #cur.execute(query_from)
-        #conn.commit()
+    for transid in transid_to_exe_list:
+        from_cur=df_trans['currency_from'][transid-1]
+        from_id=df_trans['wallet_from_id'][transid-1]
+        from_wallet=df_wallet.loc[df_wallet['currency']==from_cur]
+        from_wallet=from_wallet.loc[from_wallet['user_id']==from_id]
+        from_amount=from_wallet['amount'][0]-df_trans['amount_from'][transid-1]
         
-        #query_to="update wallets set amount=%d where(user_id=%d and currency='%s');"%()
-        #cur.execute(query_to)
-        #conn.commit()
+        query_from="update wallets set amount=%d where(user_id=%d and currency='%s');"%(from_amount,from_id,from_cur)
+        cur.execute(query_from)
 
-    #for i in range(0,n_to_exe):
-     #   cur.execute()
-    
+        to_cur=df_trans['currency_to'][transid-1]
+        to_id=df_trans['wallet_to_id'][transid-1]
+        to_wallet=df_wallet.loc[df_wallet['currency']==to_cur]
+        to_wallet=to_wallet.loc[to_wallet['user_id']==to_id]
+        to_amount=to_wallet['amount'][0]+df_trans['amount_to'][transid-1]*exch_rate['currency_from']['currency_to']
+        
+        query_to="update wallets set amount=%d where(user_id=%d and currency='%s');"%(to_amount,to_id,to_cur)
+        cur.execute(query_to)
+        
+        query_processed="update trans set processed='True' where(transaction_id=%d)"%(transid)
+        cur.execute(query_processed)
+        conn.commit()
 
     conn.close()
     #return()
@@ -96,10 +110,10 @@ def login():
 
     if success:
         #app.config.update(dict(USERNAME=content['username']))
-        json_output=json.dumps({'token':X_Token,'success':True,'is_main':False})
+        json_output=json.dumps({'token':X_Token,'success':True})
 
     else:
-        json_output=json.dumps({'token':'generic_token','success':False,'is_main':False})
+        json_output=json.dumps({'token':'generic_token','success':False})
     
     str_output=str(json.loads(json_output))
     return(json_output)
@@ -120,9 +134,11 @@ def wallets():
     conn=sq3.connect(dbpath)
     df_user=pd.read_sql_query("SELECT * FROM user;",conn)
     df_wallets=pd.read_sql_query("SELECT * FROM wallets;",conn)
+    df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
     conn.close()
     
     try:
+    #if True:
         
         #current_user=app.config['USERNAME']
         current_user=((df_user.loc[df_user['xtoken']==X_Token])['username'].tolist())[0]
@@ -131,10 +147,21 @@ def wallets():
         df_current_wallet=df_wallets.loc[df_wallets['user_id']==current_user_id]
         current_wallet=df_current_wallet.values
 
-
+        
+        df_pending=df_trans.loc[df_trans['processed']=='False']
+        df_pending=df_pending.loc[df_pending['wallet_from_id']==current_user_id]
+        
+        pending_dict={}
+        for wc in df_current_wallet['currency'].unique():
+            df_temp_pendings=(df_pending.loc[df_pending['currency_from']==wc])
+            wc_pendings_list=[]
+            for i in range(0,(df_temp_pendings).shape[0]):
+                wc_pendings_list.append({'currency_to':df_temp_pendings['currency_to'][i] ,'amount':df_temp_pendings['amount_from'][i] ,'until':df_temp_pendings['until'][i] })
+            pending_dict[wc]=wc_pendings_list
+                
 
         n_wallets=current_wallet.shape[0]
-        json_output=json.dumps({'wallets':[{'currency':df_current_wallet['currency'][i] , 'amount':str(df_current_wallet['amount'][i])} for i in range(0,n_wallets) ] ,'is_main':True})
+        json_output=json.dumps({'wallets':[{'currency':df_current_wallet['currency'][i] , 'amount':str(df_current_wallet['amount'][i]),'is_main':i==0,'pending':pending_dict[df_current_wallet['currency'][i]] } for i in range(0,n_wallets) ]})
         
 
         
@@ -144,6 +171,8 @@ def wallets():
     except:
         json_output=json.dumps({'status':'unsuccessful'})
 
+    
+    #return(str(current_wallet))
     #return(current_user)
     #return('hellolo')
     #return(output)
@@ -188,10 +217,10 @@ def transaction():
     
         conn.close()
         output_message='success'
-        json_output=json.dumps({'success':True,'is_main':False})
+        json_output=json.dumps({'success':True})
     except:
         output_message='unsuccessful'
-        json_output=json.dumps({'success':False,'is_main':False})
+        json_output=json.dumps({'success':False})
         conn.close()
     #return(str(content))
     #return(current_user_id)
