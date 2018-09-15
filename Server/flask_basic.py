@@ -12,12 +12,27 @@ import sqlite3 as sq3
 import requests
 import json #json dumps and loads
 import pandas as pd
+import datetime
 
 app=Flask(__name__)
 dbpath=os.path.join(os.getcwd(),'fc_db.db')
 
 @app.route("/")
 def index():
+    
+    #nowtime=datetime.datetime.now()
+    #untiltime=
+    
+    #conn=sq3.connect(dbpath)
+    #df_user=pd.read_sql_query("SELECT * FROM user;",conn)
+    #df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
+
+
+    #if nowtime>untiltime: #execute last transaction and delete in database
+
+    
+
+    #return()
     return(jsonify({'hello_key':'hello_value'}))
 
 @app.route("/login",methods=['GET','POST'])
@@ -88,26 +103,43 @@ def wallets():
     #return(output)
     #return(str(current_user_rowindex))
     #return(str(current_wallet))
-    return(str_output)
+    return(json_output)
 
 @app.route("/transaction",methods=['GET','POST'])
 def transaction():
-    content=request.json #decoded here into dict
+    try:
+        content=request.json #decoded here into dict
     
-    conn=sq3.connect(dbpath)
-    df_user=pd.read_sql_query("SELECT * FROM user;",conn)
-    df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
-    
-    
-    
+        conn=sq3.connect(dbpath)
+        df_user=pd.read_sql_query("SELECT * FROM user;",conn)
+        df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
+   
+        current_user=app.config['USERNAME']
+        current_user_rowindex=(df_user.index[df_user['username']==current_user].tolist())[0]
+        current_user_id=df_user['id'][current_user_rowindex]
+
+
+        cur=conn.cursor()
+        write_query="insert into trans(id, wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from) values(%d,%d,%d,'%s','%s','%s',%.2f);"%(current_user_id,current_user_id,current_user_id,content['currency_from'],content['currency_to'],content['until'],float(content['amount']))
+        cur.execute(write_query) #to implement functionality to account for modification of column names
+    #cur.execute("insert into trans(id, wallet_from_id, wallet_to_id, currency_from, currency_to, until, amount_from) values(1,1,1,'EUR','USD','2018-09-18',50.00);")
+        conn.commit()
     #try:
         #success=True
     #except:
         #success=False
-    json_output=json.dumps([{'success':success}])
+    #json_output=json.dumps([{'success':success}])
     
-    conn.close()
+        conn.close()
+        #output_message='success'
+        json_output=json.dumps({'success':True})
+    except:
+        #output_message='unsuccessful'
+        json_output=json.dumps({'success':False})
+    #return(output_message)
     return(json_output)
+    #return(write_query)
+    #return()
 
 #@app.route("/send-transaction",methods=['GET','POST'])
 #def send_transaction():
