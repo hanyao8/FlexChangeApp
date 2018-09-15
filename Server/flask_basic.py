@@ -22,16 +22,17 @@ def index():
 
 @app.route("/login",methods=['GET','POST'])
 def login():
-    error=None
+    #error=None
     if request.method=='POST':
         heads=request.headers
         X_Token=heads['X-Token']
-        content=request.json
+        content=request.json #decoded here into dict
         
 
         conn=sq3.connect(dbpath)
         df=pd.read_sql_query("SELECT * FROM user;",conn)
-    
+        conn.close()
+
     #success=True
     if not(content['username'] in df['username'].tolist()):
         success=False
@@ -46,6 +47,7 @@ def login():
             message='3'
 
     if success:
+        app.config.update(dict(USERNAME=content['username']))
         json_output=json.dumps([{'token':X_Token,'success':True}])
 
     else:
@@ -62,13 +64,50 @@ def login():
     #return(content)
     #return(str(content))
 
-@app.route("/wallets",methods=['GET','POST'])
-def update():
-    return("")
+@app.route("/wallets")
+def wallets():
+    conn=sq3.connect(dbpath)
+    df_user=pd.read_sql_query("SELECT * FROM user;",conn)
+    df_wallets=pd.read_sql_query("SELECT * FROM wallets;",conn)
+    conn.close()
+    
+
+
+    current_user=app.config['USERNAME']
+    current_user_rowindex=(df_user.index[df_user['username']==current_user].tolist())[0]
+    current_user_id=df_user['id'][current_user_rowindex]
+    df_current_wallet=df_wallets.loc[df_wallets['user_id']==current_user_id]
+    current_wallet=df_current_wallet.values
+
+    n_wallets=current_wallet.shape[0]
+    json_output=json.dumps({'wallets':[{'currency':df_current_wallet['currency'][i] , 'amount':str(df_current_wallet['amount'][i])} for i in range(0,n_wallets) ] })
+    str_output=str(json.loads(json_output))
+    
+    #return(current_user)
+    #return('hellolo')
+    #return(output)
+    #return(str(current_user_rowindex))
+    #return(str(current_wallet))
+    return(str_output)
 
 @app.route("/transaction",methods=['GET','POST'])
 def transaction():
-    return()
+    content=request.json #decoded here into dict
+    
+    conn=sq3.connect(dbpath)
+    df_user=pd.read_sql_query("SELECT * FROM user;",conn)
+    df_trans=pd.read_sql_query("SELECT * FROM trans;",conn)
+    
+    
+    
+    #try:
+        #success=True
+    #except:
+        #success=False
+    json_output=json.dumps([{'success':success}])
+    
+    conn.close()
+    return(json_output)
 
 #@app.route("/send-transaction",methods=['GET','POST'])
 #def send_transaction():
