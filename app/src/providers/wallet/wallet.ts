@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
 
 export interface walletModel {
@@ -24,23 +23,28 @@ export class WalletProvider {
   }
 
   getWalletsData() {
-    this.http.get<Observable<walletModel>>(this.walletApi).pipe(
-      map((response: any) => response = response.wallets)
-    ).subscribe(
-      (response) => {
-        const mainWalletArr = [];
-        const walletsArr = [];
-        for (let i = 0; i < response.length; i++) {
-          if (response[i].is_main) {
-            mainWalletArr.push(response[i]);
-          } else {
-            walletsArr.push(response[i]);
+    this.http.get<Observable<walletModel>>(this.walletApi)
+      .subscribe(
+        (response: any) => {
+          console.log(response);
+          if (response && 'wallets' in response) {
+            response = response.wallets;
+            const mainWalletArr = [];
+            const walletsArr = [];
+            console.log(response);
+            for (let i = 0; i < response.length; i++) {
+              if (response[i].is_main) {
+                mainWalletArr.push(response[i]);
+              } else {
+                walletsArr.push(response[i]);
+              }
+            }
+            this.mainWallet.next(mainWalletArr);
+            this.wallets.next(walletsArr);
           }
+
         }
-        this.mainWallet.next(mainWalletArr);
-        this.wallets.next(walletsArr);
-      }
-    );
+      );
   }
 
 }
