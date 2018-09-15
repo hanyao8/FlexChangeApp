@@ -12,4 +12,10 @@ page-login {
   .submit-btn {
     height: 4.5rem;
   }
+
+  .login-failed {
+    background-color: #f53d3d;
+    color: #ffffff;
+    margin-bottom: 0 !important;
+  }
 }
