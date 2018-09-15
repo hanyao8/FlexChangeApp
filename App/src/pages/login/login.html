@@ -1,37 +1,40 @@
-ion-header>
-<ion-navbar>
-  <ion-title>
-    Login
-  </ion-title>
-</ion-navbar>
-</ion-header>
 <ion-content padding>
-  <form #loginForm="ngForm" (ngSubmit)="login()" autocomplete="off">
-    <ion-row>
-      <ion-col>
-        <ion-list inset>
-          <ion-item>
-            <ion-input placeholder="Username"
-                       formControlName="Username"
-                       type="text"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input placeholder="Password"
-                       formControlName="password"
-                       type="password"></ion-input>
-          </ion-item>
-        </ion-list>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>
-        <button ion-button class="submit-btn"
-                full
-                type="submit"
-                [disabled]="!loginForm.form.valid">
-          Login
-        </button>
-      </ion-col>
-    </ion-row>
-  </form>
+  <ion-grid style="height: 100%;">
+    <ion-col>
+      <ion-row>
+        <img style="height: 15vh;margin-top: 15vh;" src="assets/imgs/cs-logo.png" alt="The logo of Credit Suisse Group AG">
+      </ion-row>
+      <form novalidate [formGroup]="loginForm" (ngSubmit)="login()" autocomplete="off">
+        <ion-row>
+          <ion-col>
+            <ion-list inset>
+              <ion-item>
+                <ion-input placeholder="Username"
+                           formControlName="username"
+                           type="text"></ion-input>
+                <div *ngIf="loginForm.controls['username'].getError('error')">
+                  Username or Password wrong
+                </div>
+              </ion-item>
+              <ion-item>
+                <ion-input placeholder="Password"
+                           formControlName="password"
+                           type="password"></ion-input>
+              </ion-item>
+            </ion-list>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <button ion-button class="submit-btn"
+                    full
+                    type="submit"
+                    [disabled]="!loginForm.valid">
+              Login
+            </button>
+          </ion-col>
+        </ion-row>
+      </form>
+    </ion-col>
+  </ion-grid>
 </ion-content>

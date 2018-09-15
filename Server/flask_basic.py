@@ -19,6 +19,11 @@ app=Flask(__name__)
 app.config.update(dict(SECRET_KEY='secret_key'))
 dbpath=os.path.join(os.getcwd(),'fc_db.db')
 
+@app.after_request
+def enable_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
 @app.route("/")
 def index():
 
