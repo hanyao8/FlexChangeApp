@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
+import { environment } from "../../environment/environment";
 
 export interface walletModel {
   currency: string;
@@ -10,12 +11,11 @@ export interface walletModel {
     currency_to: string;
     amount: string;
     until: string;
-  };
+  }[];
 }
 
 @Injectable()
 export class WalletProvider {
-  private walletApi = 'http://radiant-earth-58477.herokuapp.com/wallets';
   public mainWallet: BehaviorSubject<walletModel[]> = new BehaviorSubject([]);
   public wallets: BehaviorSubject<walletModel[]> = new BehaviorSubject([]);
 
@@ -23,15 +23,14 @@ export class WalletProvider {
   }
 
   getWalletsData() {
-    this.http.get<Observable<walletModel>>(this.walletApi)
+    const url = environment.serverUrl + '/wallets';
+    this.http.get<Observable<walletModel>>(url)
       .subscribe(
         (response: any) => {
-          console.log(response);
           if (response && 'wallets' in response) {
             response = response.wallets;
             const mainWalletArr = [];
             const walletsArr = [];
-            console.log(response);
             for (let i = 0; i < response.length; i++) {
               if (response[i].is_main) {
                 mainWalletArr.push(response[i]);

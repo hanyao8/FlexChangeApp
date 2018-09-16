@@ -60,7 +60,7 @@ export class DepositPage {
         if (depositedSuccessfully) {
           this.navCtrl.pop();
           const toast = this.toast.create({
-            message: `Created deposit of ${amount} to transfer from ${currencyFrom} to ${currencyTo}`,
+            message: `Created deposit of ${Math.abs(amount)} to transfer from ${currencyFrom} to ${currencyTo}`,
             duration: 3000,
             position: 'bottom',
             showCloseButton: true,
